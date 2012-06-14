@@ -1,8 +1,8 @@
-require 'spree_core'
-
 module SpreeCybersourceGateway
   class Engine < Rails::Engine
+    require 'spree_core'
     engine_name 'spree_cybersource_gateway'
+    isolate_namespace Spree
 
     config.autoload_paths += %W(#{config.root}/lib)
 
@@ -12,23 +12,18 @@ module SpreeCybersourceGateway
     end
 
     def self.activate
-       require 'active_merchant'
-       ActiveMerchant::Billing::CyberSourceGateway
-     
       Dir.glob(File.join(File.dirname(__FILE__), "../../app/**/*_decorator*.rb")) do |c|
-        Rails.application.config.cache_classes ? require(c) : load(c)
-      end
-
-      Dir.glob(File.join(File.dirname(__FILE__), "../../app/overrides/*.rb")) do |c|
         Rails.application.config.cache_classes ? require(c) : load(c)
       end
     end
 	
-      config.after_initialize do |app|
-        app.config.spree.payment_methods += [
-          Gateway::CyberSource
-        ]
-       end
     config.to_prepare &method(:activate).to_proc
+
+    initializer "cybersource.register.payment_methods" do |app|
+      app.config.spree.payment_methods += [
+                                           Spree::Gateway::CyberSource
+    ]
+    end
+
   end
 end
