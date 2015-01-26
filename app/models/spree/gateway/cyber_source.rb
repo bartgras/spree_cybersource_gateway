@@ -1,5 +1,5 @@
 module Spree
-  class Gateway::CyberSource < Gateway
+  class Gateway::CyberSource < Spree::Gateway
     preference :login, :string
     preference :password, :string
 
